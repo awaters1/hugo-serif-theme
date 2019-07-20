@@ -1,32 +1,41 @@
 {{- if .Site.IsServer -}}
 <!-- Dont add Google analytics to localhost -->
 {{ else }}
-{{ $gid := (getenv "HUGO_GOOGLE_ANALYTICS_ID") }}
-{{ if $gid }}
-<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id={{- $gid -}}"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
+  {{ $gid := (getenv "HUGO_GOOGLE_ANALYTICS_ID") }}
+  {{ if $gid }}
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{- $gid -}}"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
 
-  function gtag() {
-    dataLayer.push(arguments);
-  }
-  gtag('js', new Date());
-  gtag('config', '{{- $gid -}}');
-</script>
-{{ else }}
-{{ if .Site.Params.google_analytics_id }}
-<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id={{- .Site.Params.google_analytics_id -}}"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag('js', new Date());
+      gtag('config', '{{- $gid -}}');
+    </script>
+  {{ else }}
+    {{ if or .Site.Params.google_analytics_id .Params.analyticsId }}
+      <!-- Global site tag (gtag.js) - Google Analytics -->
+      {{ if (isset .Params "analyticsid") }}
+        <script async src="https://www.googletagmanager.com/gtag/js?id={{- .Params.analyticsId -}}"></script>  
+      {{ else }}
+        <script async src="https://www.googletagmanager.com/gtag/js?id={{- .Site.Params.google_analytics_id -}}"></script>
+      {{ end }}
+      <script>
+        window.dataLayer = window.dataLayer || [];
 
-  function gtag() {
-    dataLayer.push(arguments);
-  }
-  gtag('js', new Date());
-  gtag('config', '{{- .Site.Params.google_analytics_id -}}');
-</script>
-{{ end }}
-{{ end}}
+        function gtag() {
+          dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+        {{ if (isset .Params "analyticsid") }}
+        gtag('config', '{{- .Params.analyticsId -}}');
+        {{ else }}
+        gtag('config', '{{- .Site.Params.google_analytics_id -}}');
+        {{ end }}
+        
+      </script>
+    {{ end }}
+  {{ end}}
 {{ end }}
